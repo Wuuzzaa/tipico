@@ -8,8 +8,12 @@ class Match:
         self.liga = liga
         self.lowest_quote = self.get_lowest_quote()
 
-    def __str__(self):
-        return f"{self.liga}: {self.home_team} vs. {self.away_team}: {self.quote_home_win} {self.quote_draw} {self.quote_away_win}"
+    def __str__(self, mode=None):
+        if mode == "ONLY_LOWEST_QUOTE":
+            return f"{self.liga}: {self.home_team} vs. {self.away_team}: {self.lowest_quote}"
+
+        else:
+            return f"{self.liga}: {self.home_team} vs. {self.away_team}: {self.quote_home_win} {self.quote_draw} {self.quote_away_win}"
 
     def get_lowest_quote(self):
         return min(self.quote_away_win, self.quote_draw, self.quote_home_win)
