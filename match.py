@@ -18,3 +18,13 @@ class Match:
     def get_lowest_quote(self):
         return min(self.quote_away_win, self.quote_draw, self.quote_home_win)
 
+    def get_outcome_with_lowest_quote(self):
+        if self.quote_home_win == self.lowest_quote:
+            return "HOME"
+
+        if self.quote_draw == self.lowest_quote:
+            return "DRAW"
+
+        if self.quote_away_win == self.lowest_quote:
+            return "AWAY"
+

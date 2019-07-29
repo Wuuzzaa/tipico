@@ -117,3 +117,5 @@ class TipicoScraper:
     def print_matches(self):
         for match in self.matches:
             print(match.__str__("ONLY_LOWEST_QUOTE"))
+
+
