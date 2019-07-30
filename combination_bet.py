@@ -17,5 +17,5 @@ class CombinationBet:
         for bet in self.bets:
             combi_quote *= bet.quote
 
-        return combi_quote
+        return round(combi_quote, 2)
 
