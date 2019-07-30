@@ -20,12 +20,12 @@ def chunks(l, n):
 
 
 class CombinationBetCreator:
-    def __init__(self, matches):
+    def __init__(self, matches=None, bets=None, combi_bets=None):
         self.matches = matches
-        self.bets = self.create_bets_with_outcome_lowest_quote()
-        self.combi_bets = self.create_random_combi_bets()
-        self.mean = self.calc_combi_bets_mean()
-        self.stdev = self.calc_combi_bets_stdev()
+        self.bets = bets
+        self.combi_bets = combi_bets
+        self.mean = None
+        self.stdev = None
         # self.all_combinations = None
         # self.best_combinations = None
 
@@ -37,13 +37,13 @@ class CombinationBetCreator:
     #         print(comb)
 
     def create_bets_with_outcome_lowest_quote(self):
-        bets = []
+        self.bets = []
 
         for match in self.matches:
             outcome = match.get_outcome_with_lowest_quote()
-            bets.append(Bet(match, outcome))
+            self.bets.append(Bet(match, outcome))
 
-        return bets
+        return self.bets
 
     def create_random_combi_bets(self, combination_size=3):
         """
@@ -54,23 +54,23 @@ class CombinationBetCreator:
         """
         bets = deepcopy(self.bets)
         shuffle(bets)
-        combi_bets = []
+        self.combi_bets = []
 
         combi_bets_matches = list(chunks(bets, combination_size))
 
         for combi in combi_bets_matches:
-            combi_bets.append(CombinationBet(combi))
+            self.combi_bets.append(CombinationBet(combi))
 
         # remove combibets which not contain enough bets
-        not_used_combi_bets = [combi for combi in combi_bets if len(combi.bets) != combination_size]
-        combi_bets = [combi for combi in combi_bets if len(combi.bets) == combination_size]
+        not_used_combi_bets = [combi for combi in self.combi_bets if len(combi.bets) != combination_size]
+        self.combi_bets = [combi for combi in self.combi_bets if len(combi.bets) == combination_size]
 
         if not_used_combi_bets:
             print("Not enough matches to create combo. Following matches are not used")
             for combi in not_used_combi_bets:
                 print(combi)
 
-        return combi_bets
+        return self.combi_bets
 
     def __str__(self):
         text = \
@@ -78,8 +78,8 @@ class CombinationBetCreator:
             f"Mean: {self.mean}\n" \
             f"Stdev: {self.stdev}\n" \
             f"Combination Bets: \n"
-        for combi_bet in self.combi_bets:
-            text += f"{str(combi_bet)} \n"
+        # for combi_bet in self.combi_bets:
+        #     text += f"{str(combi_bet)} \n"
 
         return text
 
@@ -104,6 +104,10 @@ class CombinationBetCreator:
     def sort_combi_bets_by_quote(self):
         self.combi_bets.sort(key=lambda combi_bet: combi_bet.combi_quote)
 
+    def sort_combi_bets_by_stdev(self, l):
+        l.sort(key=lambda combi_bet: combi_bet.stdev)
+        return l
+
     def optimize(self):
         low = 0
         high = len(self.combi_bets) - 1
@@ -112,36 +116,32 @@ class CombinationBetCreator:
             stdev_before = self.stdev
 
             #todo optimize low and high to two new combibets
-            bets = set(self.combi_bets[low] + self.combi_bets[high])
-            combis = set(combinations(bets, 3))
+            all_bets = set(self.combi_bets[low].bets + self.combi_bets[high].bets)
+            combis = set(combinations(all_bets, 3))
             pairs = []
 
             # generate all possible combination pairs
             for i in combis:
                 x = set(i)
-                y = bets - x
-                pairs.append((x, y))
+                y = all_bets - x
 
-            # generate all combi bet pairs as dict
-            # key is a tuple of two combi bets
-            # value is the stdev between the two combi bets
-            combi_bet_pairs = dict()
+                combi_bet_1 = CombinationBet(list(x))
+                combi_bet_2 = CombinationBet(list(y))
+                pair = CombinationBetCreator(combi_bets=[combi_bet_1, combi_bet_2])
+                pair.refresh_statistics()
+                pairs.append(pair)
 
-            for x in pairs:
-                combi_bet_1 = CombinationBet(x[0])
-                combi_bet_2 = CombinationBet(x[1])
-
-                stdev = statistics.pstdev([combi_bet_1, combi_bet_2])
-                combi_bet_pairs[(combi_bet_1, combi_bet_2)] = stdev
+            pairs = self.sort_combi_bets_by_stdev(pairs)
 
             # get the combi with the lowest stdev
-            # todo
-            combi_bet_1 = None
-            combi_bet_2 = None
+            combi_bet_1 = pairs[0].combi_bets[0]
+            combi_bet_2 = pairs[0].combi_bets[1]
 
             # remove the old ones (low and high)
-            self.combi_bets.remove(self.combi_bets[low])
-            self.combi_bets.remove(self.combi_bets[high])
+            x = self.combi_bets[low]
+            y = self.combi_bets[high]
+            self.combi_bets.remove(x)
+            self.combi_bets.remove(y)
 
             # add the new optimized ones
             self.combi_bets.append(combi_bet_1)
@@ -166,5 +166,7 @@ class CombinationBetCreator:
                 high = len(self.combi_bets) - 1
 
             self.sort_combi_bets_by_quote()
+
+            print("\nOptimize:")
             print(self)
 

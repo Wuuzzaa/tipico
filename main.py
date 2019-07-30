@@ -9,7 +9,12 @@ scraper.filter_max_lowest_quote(1.5)
 scraper.print_matches()
 
 cbc = CombinationBetCreator(scraper.matches)
+cbc.create_bets_with_outcome_lowest_quote()
+cbc.create_random_combi_bets()
+cbc.refresh_statistics()
 cbc.sort_combi_bets_by_quote()
 print(cbc)
+
+cbc.optimize()
 pass
 
