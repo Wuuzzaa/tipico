@@ -6,7 +6,6 @@ from match import Match
 class TipicoScraper:
     # Constants - Soccerleagueurls
     #todo türkeiliga hinzufügen
-    #todo italienliga hinzufügen
 
     URLS = {
         "BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/bundesliga/g42301/",
@@ -17,7 +16,12 @@ class TipicoScraper:
         "LIGUE_1": "https://www.tipico.de/de/online-sportwetten/fussball/frankreich/ligue-1/g4301/",
         "PRIMEIRA_LIGA": "https://www.tipico.de/de/online-sportwetten/fussball/portugal/primeira-liga/g52301/",
         "EREDIVISIE": "https://www.tipico.de/de/online-sportwetten/fussball/niederlande/eredivisie/g39301/",
-        "MLS": "https://www.tipico.de/de/online-sportwetten/fussball/usa/mls/g18301/"
+        "MLS": "https://www.tipico.de/de/online-sportwetten/fussball/usa/mls/g18301/",
+        "TIPICO_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/osterreich/tipico-bundesliga/g29301/",
+        "SERIE_A": "https://www.tipico.de/de/online-sportwetten/fussball/italien/serie-a/g33301/",
+        "SUPERLIG": "https://www.tipico.de/de/online-sportwetten/fussball/turkei/superlig/g62301/",
+        "FIRST_DIVISION_A": "https://www.tipico.de/de/online-sportwetten/fussball/belgien/first-division-a/g38301/",
+        "SUPER_LEAGUE": "https://www.tipico.de/de/online-sportwetten/fussball/schweiz/super-league/g1060301/"
     }
 
     def __init__(self):

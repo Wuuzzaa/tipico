@@ -26,6 +26,7 @@ class CombinationBetCreator:
         self.combi_bets = combi_bets
         self.mean = None
         self.stdev = None
+        self.amount_of_combi_bets = None
         # self.all_combinations = None
         # self.best_combinations = None
 
@@ -72,14 +73,17 @@ class CombinationBetCreator:
 
         return self.combi_bets
 
-    def __str__(self):
+    def __str__(self, mode=None):
         text = \
             f"Statistics: \n" \
+            f"Amount of Combibets: {self.amount_of_combi_bets}\n" \
             f"Mean: {self.mean}\n" \
             f"Stdev: {self.stdev}\n" \
             f"Combination Bets: \n"
-        # for combi_bet in self.combi_bets:
-        #     text += f"{str(combi_bet)} \n"
+
+        if mode != "SHORT":
+            for combi_bet in self.combi_bets:
+                text += f"{str(combi_bet)} \n"
 
         return text
 
@@ -100,6 +104,7 @@ class CombinationBetCreator:
     def refresh_statistics(self):
         self.mean = self.calc_combi_bets_mean()
         self.stdev = self.calc_combi_bets_stdev()
+        self.amount_of_combi_bets = len(self.combi_bets)
 
     def sort_combi_bets_by_quote(self):
         self.combi_bets.sort(key=lambda combi_bet: combi_bet.combi_quote)
@@ -109,6 +114,7 @@ class CombinationBetCreator:
         return l
 
     def optimize(self):
+        """Method optimizes the matches in the combination bets to minimize the stdev"""
         low = 0
         high = len(self.combi_bets) - 1
 
@@ -168,5 +174,5 @@ class CombinationBetCreator:
             self.sort_combi_bets_by_quote()
 
             print("\nOptimize:")
-            print(self)
+            print(self.__str__("SHORT"))
 

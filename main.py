@@ -16,5 +16,6 @@ cbc.sort_combi_bets_by_quote()
 print(cbc)
 
 cbc.optimize()
+print(cbc)
 pass
 
