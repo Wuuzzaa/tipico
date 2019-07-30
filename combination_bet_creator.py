@@ -101,3 +101,70 @@ class CombinationBetCreator:
         self.mean = self.calc_combi_bets_mean()
         self.stdev = self.calc_combi_bets_stdev()
 
+    def sort_combi_bets_by_quote(self):
+        self.combi_bets.sort(key=lambda combi_bet: combi_bet.combi_quote)
+
+    def optimize(self):
+        low = 0
+        high = len(self.combi_bets) - 1
+
+        while not low == high:
+            stdev_before = self.stdev
+
+            #todo optimize low and high to two new combibets
+            bets = set(self.combi_bets[low] + self.combi_bets[high])
+            combis = set(combinations(bets, 3))
+            pairs = []
+
+            # generate all possible combination pairs
+            for i in combis:
+                x = set(i)
+                y = bets - x
+                pairs.append((x, y))
+
+            # generate all combi bet pairs as dict
+            # key is a tuple of two combi bets
+            # value is the stdev between the two combi bets
+            combi_bet_pairs = dict()
+
+            for x in pairs:
+                combi_bet_1 = CombinationBet(x[0])
+                combi_bet_2 = CombinationBet(x[1])
+
+                stdev = statistics.pstdev([combi_bet_1, combi_bet_2])
+                combi_bet_pairs[(combi_bet_1, combi_bet_2)] = stdev
+
+            # get the combi with the lowest stdev
+            # todo
+            combi_bet_1 = None
+            combi_bet_2 = None
+
+            # remove the old ones (low and high)
+            self.combi_bets.remove(self.combi_bets[low])
+            self.combi_bets.remove(self.combi_bets[high])
+
+            # add the new optimized ones
+            self.combi_bets.append(combi_bet_1)
+            self.combi_bets.append(combi_bet_2)
+
+            #todo end here
+            self.refresh_statistics()
+            stdev_after = self.stdev
+
+            if stdev_before == stdev_after:
+                low += 1
+
+                if low == high:
+                    low = 0
+                    high -= 1
+
+            elif stdev_before < stdev_after:
+                raise ValueError("stdev_before < stdev_after")
+
+            elif stdev_before > stdev_after:
+                low = 0
+                high = len(self.combi_bets) - 1
+
+            self.sort_combi_bets_by_quote()
+            print(self)
+
