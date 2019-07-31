@@ -1,5 +1,6 @@
 from tipico_scraper import TipicoScraper
 from combination_bet_creator import CombinationBetCreator
+from bets_to_excel import BetsToExcel
 
 scraper = TipicoScraper()
 scraper.scrape_all()
@@ -20,5 +21,8 @@ print("########################")
 
 cbc.optimize()
 print(cbc)
-pass
+
+saver = BetsToExcel(cbc.combi_bets)
+saver.fill_data_lists()
+saver.save_to_excel()
 
