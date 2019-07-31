@@ -20,22 +20,14 @@ def chunks(l, n):
 
 
 class CombinationBetCreator:
-    def __init__(self, matches=None, bets=None, combi_bets=None):
+    def __init__(self, matches=None, bets=None, combi_bets=None, combination_size=3):
+        self.combination_size = combination_size
         self.matches = matches
         self.bets = bets
         self.combi_bets = combi_bets
         self.mean = None
         self.stdev = None
         self.amount_of_combi_bets = None
-        # self.all_combinations = None
-        # self.best_combinations = None
-
-    # def create_all_combinations(self, amount_of_matches=3):
-    #     self.all_combinations = set(combinations(self.matches, amount_of_matches))
-    #
-    # def print_all_combinations(self):
-    #     for comb in self.all_combinations:
-    #         print(comb)
 
     def create_bets_with_outcome_lowest_quote(self):
         self.bets = []
@@ -46,25 +38,24 @@ class CombinationBetCreator:
 
         return self.bets
 
-    def create_random_combi_bets(self, combination_size=3):
+    def create_random_combi_bets(self):
         """
         Method creates random combibets of combination_size size. Creates only complete combi_bets and print the not
         used ones
-        :param combination_size:
         :return:
         """
         bets = deepcopy(self.bets)
         shuffle(bets)
         self.combi_bets = []
 
-        combi_bets_matches = list(chunks(bets, combination_size))
+        combi_bets_matches = list(chunks(bets, self.combination_size))
 
         for combi in combi_bets_matches:
             self.combi_bets.append(CombinationBet(combi))
 
         # remove combibets which not contain enough bets
-        not_used_combi_bets = [combi for combi in self.combi_bets if len(combi.bets) != combination_size]
-        self.combi_bets = [combi for combi in self.combi_bets if len(combi.bets) == combination_size]
+        not_used_combi_bets = [combi for combi in self.combi_bets if len(combi.bets) != self.combination_size]
+        self.combi_bets = [combi for combi in self.combi_bets if len(combi.bets) == self.combination_size]
 
         if not_used_combi_bets:
             print("Not enough matches to create combo. Following matches are not used")
@@ -123,7 +114,7 @@ class CombinationBetCreator:
 
             #todo optimize low and high to two new combibets
             all_bets = set(self.combi_bets[low].bets + self.combi_bets[high].bets)
-            combis = set(combinations(all_bets, 3))
+            combis = set(combinations(all_bets, self.combination_size))
             pairs = []
 
             # generate all possible combination pairs
