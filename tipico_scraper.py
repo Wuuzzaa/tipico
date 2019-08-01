@@ -72,13 +72,41 @@ class TipicoScraper:
 
         return home_win_quotes, draw_quotes, away_win_quotes
 
-    def __create_matches(self, home_teams, away_teams, home_win_quotes, draw_quotes, away_win_quotes, liga):
+    def __scrape_match_date_and_time(self):
+        """
+        :return: 2 lists. a list with the date of the game. format: e.g Freitag, 16.08 -> Weekday, DD.MM
+                 Second list contains the time of the match. format: hh.mm
+        """
+        time_soup = self.soup.find_all("div", attrs={"class": "w_40 bl align_c left"})
+        times = []
+        dates = []
+
+        for row in time_soup:
+            # time
+            time = row.text.strip()
+            times.append(time)
+
+            # date
+            # Only the first match of a day has in the parents sibling the date in the text.
+            # For the other matches on this day this is not the case but the date stays the same ;-)
+            try:
+                date = row.parent.find_previous_sibling("div", attrs={"class": "t_space bg_white"}).text
+            except AttributeError:
+                pass
+            dates.append(date)
+
+        assert len(times) == len(dates)
+        return dates, times
+
+    def __create_matches(self, home_teams, away_teams, home_win_quotes, draw_quotes, away_win_quotes, league, dates, times):
         assert \
             len(home_teams) == \
             len(away_teams) == \
             len(home_win_quotes) == \
             len(draw_quotes) == \
-            len(away_win_quotes)
+            len(away_win_quotes) == \
+            len(dates) == \
+            len(times)
 
         amount_matches = len(home_teams)
 
@@ -90,7 +118,9 @@ class TipicoScraper:
                     home_win_quotes[i],
                     draw_quotes[i],
                     away_win_quotes[i],
-                    liga
+                    league,
+                    dates[i],
+                    times[i]
                 )
             )
 
@@ -103,7 +133,17 @@ class TipicoScraper:
             self.__read_site_soup(url)
             home_teams, away_teams = self.__scrape_teams()
             home_win_quotes, draw_quotes, away_win_quotes = self.__scrape_quotes()
-            self.__create_matches(home_teams, away_teams, home_win_quotes, draw_quotes, away_win_quotes, liga_name)
+            dates, times = self.__scrape_match_date_and_time()
+            self.__create_matches(
+                home_teams,
+                away_teams,
+                home_win_quotes,
+                draw_quotes,
+                away_win_quotes,
+                liga_name,
+                dates,
+                times
+            )
 
     def sort_matches_by_lowest_quote(self):
         self.matches.sort(key=lambda match: match.lowest_quote)

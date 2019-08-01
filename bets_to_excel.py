@@ -12,16 +12,18 @@ class BetsToExcel:
         self.combi_quotes = []
         self.home_teams = []
         self.away_teams = []
+        self.match_dates = []
 
     def fill_data_lists(self):
         for combi_bet in self.combi_bets:
             for bet in combi_bet.bets:
                 self.predicted_outcomes.append(bet.outcome)
                 self.actual_outcomes.append(None)
-                self.leagues.append(bet.match.liga)
+                self.leagues.append(bet.match.league)
                 self.quotes.append(bet.quote)
                 self.home_teams.append(bet.match.home_team)
                 self.away_teams.append(bet.match.away_team)
+                self.match_dates.append(bet.match.date)
 
                 # Add the combibetquote only once per combibet
                 if bet == combi_bet.bets[0]:
@@ -37,6 +39,7 @@ class BetsToExcel:
             self.combi_quotes.append(None)
             self.home_teams.append(None)
             self.away_teams.append(None)
+            self.match_dates.append(None)
 
     def save_to_excel(self):
         print(f"Save bets to: {self.file_name}")
@@ -44,6 +47,7 @@ class BetsToExcel:
         df = pd.DataFrame(
             {
                 "Combination Quote:": self.combi_quotes,
+                "Date:": self.match_dates,
                 "Quote:": self.quotes,
                 "League:": self.leagues,
                 "Home Team:": self.home_teams,
