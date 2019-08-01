@@ -5,8 +5,6 @@ from match import Match
 
 class TipicoScraper:
     # Constants - Soccerleagueurls
-    #todo türkeiliga hinzufügen
-
     URLS = {
         "BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/bundesliga/g42301/",
         "2_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/2-bundesliga/g41301/",
