@@ -1,3 +1,6 @@
+import datetime
+
+
 class Match:
     def __init__(self, home_team, away_team, quote_home_win, quote_draw, quote_away_win, league, date, time):
         self.home_team = home_team
@@ -9,6 +12,7 @@ class Match:
         self.date = date
         self.time = time
         self.lowest_quote = self.get_lowest_quote()
+        self.datetime = self.parse_date()
 
     def __str__(self, mode=None):
         if mode == "ONLY_LOWEST_QUOTE":
@@ -29,4 +33,12 @@ class Match:
 
         if self.quote_away_win == self.lowest_quote:
             return "AWAY"
+
+    def parse_date(self):
+        year = datetime.datetime.now().year
+        day = int(self.date.split(" ")[1][:2])
+        month = int(self.date[-3:-1:])
+        hh = int(self.time.split(":")[0])
+        mm = int(self.time.split(":")[1])
+        return datetime.datetime(year, month, day, hh, mm)
 
