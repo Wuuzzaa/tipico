@@ -164,6 +164,6 @@ class CombinationBetCreator:
 
             self.sort_combi_bets_by_quote()
 
-            print("\nOptimize:")
-            print(self.__str__("SHORT"))
+            #print("\nOptimize:")
+            #print(self.__str__("SHORT"))
 
