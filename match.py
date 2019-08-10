@@ -35,6 +35,8 @@ class Match:
             return "AWAY"
 
     def parse_date(self):
+        #todo fix when a game is already running i get thease error: ValueError: invalid literal for int() with base 10: '35 Min.'
+
         year = datetime.datetime.now().year
         day = int(self.date.split(" ")[1][:2])
         month = int(self.date[-3:-1:])

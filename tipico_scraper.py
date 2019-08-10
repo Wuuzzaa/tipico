@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup as Bs
 from match import Match
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
 
 
 class TipicoScraper:
@@ -19,19 +21,30 @@ class TipicoScraper:
         "SERIE_A": "https://www.tipico.de/de/online-sportwetten/fussball/italien/serie-a/g33301/",
         "SUPERLIG": "https://www.tipico.de/de/online-sportwetten/fussball/turkei/superlig/g62301/",
         "FIRST_DIVISION_A": "https://www.tipico.de/de/online-sportwetten/fussball/belgien/first-division-a/g38301/",
-        "SUPER_LEAGUE": "https://www.tipico.de/de/online-sportwetten/fussball/schweiz/super-league/g1060301/"
+        "SUPER_LEAGUE": "https://www.tipico.de/de/online-sportwetten/fussball/schweiz/super-league/g1060301/",
     }
 
     def __init__(self):
         self.matches = []
         self.soup = None
 
+        # init the driver
+        options = Options()
+        options.add_argument("--headless")
+        self.driver = webdriver.Firefox(firefox_options=options)
+
     def clear(self):
         self.matches = []
 
     def __read_site_soup(self, url):
-        source = requests.get(url).text
-        self.soup = Bs(source, "html.parser")
+        self.driver.get(url)
+
+        buttons = self.driver.find_elements_by_xpath("//div[@class='t_more bl align_c right']")
+
+        for button in buttons:
+            button.click()
+
+        self.soup = Bs(self.driver.page_source, "html.parser")
 
     def __scrape_teams(self):
         """
