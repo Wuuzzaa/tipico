@@ -1,27 +1,27 @@
-import requests
 from bs4 import BeautifulSoup as Bs
 from match import Match
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
+import datetime
 
 
 class TipicoScraper:
     # Constants - Soccerleagueurls
     URLS = {
         "BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/bundesliga/g42301/",
-        "2_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/2-bundesliga/g41301/",
-        "3_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/3-liga/g8343301/",
+        #"2_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/2-bundesliga/g41301/",
+        #"3_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/3-liga/g8343301/",
         "PREMIER_LEAGUE": "https://www.tipico.de/de/online-sportwetten/fussball/england/premier-league/g1301/",
         "LA_LIGA": "https://www.tipico.de/de/online-sportwetten/fussball/spanien/la-liga/g36301/",
         "LIGUE_1": "https://www.tipico.de/de/online-sportwetten/fussball/frankreich/ligue-1/g4301/",
         "PRIMEIRA_LIGA": "https://www.tipico.de/de/online-sportwetten/fussball/portugal/primeira-liga/g52301/",
         "EREDIVISIE": "https://www.tipico.de/de/online-sportwetten/fussball/niederlande/eredivisie/g39301/",
         "MLS": "https://www.tipico.de/de/online-sportwetten/fussball/usa/mls/g18301/",
-        "TIPICO_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/osterreich/tipico-bundesliga/g29301/",
+        #"TIPICO_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/osterreich/tipico-bundesliga/g29301/",
         "SERIE_A": "https://www.tipico.de/de/online-sportwetten/fussball/italien/serie-a/g33301/",
         "SUPERLIG": "https://www.tipico.de/de/online-sportwetten/fussball/turkei/superlig/g62301/",
         "FIRST_DIVISION_A": "https://www.tipico.de/de/online-sportwetten/fussball/belgien/first-division-a/g38301/",
-        "SUPER_LEAGUE": "https://www.tipico.de/de/online-sportwetten/fussball/schweiz/super-league/g1060301/",
+        #"SUPER_LEAGUE": "https://www.tipico.de/de/online-sportwetten/fussball/schweiz/super-league/g1060301/",
     }
 
     def __init__(self):
@@ -168,6 +168,17 @@ class TipicoScraper:
     def filter_max_lowest_quote(self, quote):
         """Filters all matches which lowest quote is higher than the quote parameter"""
         self.matches = [x for x in self.matches if x.lowest_quote <= quote]
+
+    def filter_time_horizon_start_in_next_days(self, start_in_next_days):
+        """
+        Filters all matches which are not in the next days from current time on.
+        E.g Current time in 27.09.2019 14:45 and days= 2 then all matches later then 29.09.2019 14:45 are removed
+        :type start_in_next_days: int
+        """
+        now = datetime.datetime.today()
+        limit_datetime = now + + datetime.timedelta(days=start_in_next_days)
+
+        self.matches = [x for x in self.matches if x.datetime <= limit_datetime]
 
     def print_matches(self):
         for match in self.matches:

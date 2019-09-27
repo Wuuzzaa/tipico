@@ -11,8 +11,9 @@ def main():
 
     # filter
     scraper.sort_matches_by_lowest_quote()
+    scraper.filter_time_horizon_start_in_next_days(7)
     scraper.filter_min_lowest_quote(1.15)
-    scraper.filter_max_lowest_quote(1.49)
+    scraper.filter_max_lowest_quote(1.45)
     scraper.print_matches()
     print("########################")
 
