@@ -9,19 +9,19 @@ class TipicoScraper:
     # Constants - Soccerleagueurls
     URLS = {
         "BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/bundesliga/g42301/",
-        #"2_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/2-bundesliga/g41301/",
-        #"3_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/3-liga/g8343301/",
+        "2_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/2-bundesliga/g41301/",
+        "3_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/3-liga/g8343301/",
         "PREMIER_LEAGUE": "https://www.tipico.de/de/online-sportwetten/fussball/england/premier-league/g1301/",
         "LA_LIGA": "https://www.tipico.de/de/online-sportwetten/fussball/spanien/la-liga/g36301/",
         "LIGUE_1": "https://www.tipico.de/de/online-sportwetten/fussball/frankreich/ligue-1/g4301/",
         "PRIMEIRA_LIGA": "https://www.tipico.de/de/online-sportwetten/fussball/portugal/primeira-liga/g52301/",
         "EREDIVISIE": "https://www.tipico.de/de/online-sportwetten/fussball/niederlande/eredivisie/g39301/",
         "MLS": "https://www.tipico.de/de/online-sportwetten/fussball/usa/mls/g18301/",
-        #"TIPICO_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/osterreich/tipico-bundesliga/g29301/",
+        "TIPICO_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/osterreich/tipico-bundesliga/g29301/",
         "SERIE_A": "https://www.tipico.de/de/online-sportwetten/fussball/italien/serie-a/g33301/",
         "SUPERLIG": "https://www.tipico.de/de/online-sportwetten/fussball/turkei/superlig/g62301/",
         "FIRST_DIVISION_A": "https://www.tipico.de/de/online-sportwetten/fussball/belgien/first-division-a/g38301/",
-        #"SUPER_LEAGUE": "https://www.tipico.de/de/online-sportwetten/fussball/schweiz/super-league/g1060301/",
+        "SUPER_LEAGUE": "https://www.tipico.de/de/online-sportwetten/fussball/schweiz/super-league/g1060301/",
     }
 
     def __init__(self):
@@ -33,16 +33,23 @@ class TipicoScraper:
         options.add_argument("--headless")
         self.driver = webdriver.Firefox(firefox_options=options)
 
+    def __restart_driver(self):
+        self.driver.quit()
+        options = Options()
+        options.add_argument("--headless")
+        self.driver = webdriver.Firefox(firefox_options=options)
+
     def clear(self):
         self.matches = []
 
     def __read_site_soup(self, url):
         self.driver.get(url)
 
-        buttons = self.driver.find_elements_by_xpath("//div[@class='t_more bl align_c right']")
-
-        for button in buttons:
-            button.click()
+        # Make the quotes for Handicap and all other bets visible
+        # buttons = self.driver.find_elements_by_xpath("//div[@class='t_more bl align_c right']")
+        #
+        # for button in buttons:
+        #     button.click()
 
         self.soup = Bs(self.driver.page_source, "html.parser")
 
@@ -157,6 +164,14 @@ class TipicoScraper:
                 dates,
                 times
             )
+
+            # When we click on a new league on tipico the new league opens above the old league so we would receive
+            # matches multiple times. The easiest way to avoid this is to get a new browser. Better way is to delete the
+            # cookies
+            self.driver.delete_all_cookies()
+
+        # close the driver (browser)
+        self.driver.quit()
 
     def sort_matches_by_lowest_quote(self):
         self.matches.sort(key=lambda match: match.lowest_quote)
