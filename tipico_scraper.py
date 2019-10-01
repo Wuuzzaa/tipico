@@ -45,6 +45,7 @@ class TipicoScraper:
     def __read_site_soup(self, url):
         self.driver.get(url)
 
+        # TODO scrape all quotes like handicap and under over...
         # Make the quotes for Handicap and all other bets visible
         # buttons = self.driver.find_elements_by_xpath("//div[@class='t_more bl align_c right']")
         #
