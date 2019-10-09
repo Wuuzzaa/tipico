@@ -8,20 +8,58 @@ import datetime
 class TipicoScraper:
     # Constants - Soccerleagueurls
     URLS = {
+        # BRASILIEN
+        "CAMPEONATO_BRASILEIRO_SERIE_A": "https://www.tipico.de/de/online-sportwetten/fussball/brasilien/campeonato-brasilero-a/g83301/",
+        
+        # DEUTSCHLAND
         "BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/bundesliga/g42301/",
         "2_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/2-bundesliga/g41301/",
         "3_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/3-liga/g8343301/",
+
+        # DÄNEMARK
+        "SUPERLIGAEN": "https://www.tipico.de/de/online-sportwetten/fussball/danemark/superligaen/g12301/",
+
+        # ENGLAND
         "PREMIER_LEAGUE": "https://www.tipico.de/de/online-sportwetten/fussball/england/premier-league/g1301/",
+        "CHAMPIONSHIP": "https://www.tipico.de/de/online-sportwetten/fussball/england/championship/g2301/",
+
+        # SPANIEN
         "LA_LIGA": "https://www.tipico.de/de/online-sportwetten/fussball/spanien/la-liga/g36301/",
+        "LA_LIGA_2": "https://www.tipico.de/de/online-sportwetten/fussball/spanien/la-liga-2/g37301/",
+
+        # FRANKREICH
         "LIGUE_1": "https://www.tipico.de/de/online-sportwetten/fussball/frankreich/ligue-1/g4301/",
+
+        # PORTUGAL
         "PRIMEIRA_LIGA": "https://www.tipico.de/de/online-sportwetten/fussball/portugal/primeira-liga/g52301/",
+
+        # NIEDERLANDE
         "EREDIVISIE": "https://www.tipico.de/de/online-sportwetten/fussball/niederlande/eredivisie/g39301/",
+
+        # USA
         "MLS": "https://www.tipico.de/de/online-sportwetten/fussball/usa/mls/g18301/",
+
+        # ÖSTERREICH
         "TIPICO_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/osterreich/tipico-bundesliga/g29301/",
+
+        # ITALIEN
         "SERIE_A": "https://www.tipico.de/de/online-sportwetten/fussball/italien/serie-a/g33301/",
+        "SERIE_B": "https://www.tipico.de/de/online-sportwetten/fussball/italien/serie-b/g34301/",
+
+        # TÜRKEI
         "SUPERLIG": "https://www.tipico.de/de/online-sportwetten/fussball/turkei/superlig/g62301/",
+
+        # BELGIEN
         "FIRST_DIVISION_A": "https://www.tipico.de/de/online-sportwetten/fussball/belgien/first-division-a/g38301/",
+
+        # SCHWEIZ
         "SUPER_LEAGUE": "https://www.tipico.de/de/online-sportwetten/fussball/schweiz/super-league/g1060301/",
+
+        # SCHWEDEN
+        "ALLSVENSKAN": "https://www.tipico.de/de/online-sportwetten/fussball/schweden/allsvenskan/g24301/",
+
+        # RUSSLAND
+        "PREMIER_LEAGUE(RUSSLAND)": "https://www.tipico.de/de/online-sportwetten/fussball/russland/premier-league/g53301/",
     }
 
     def __init__(self):
@@ -45,12 +83,7 @@ class TipicoScraper:
     def __read_site_soup(self, url):
         self.driver.get(url)
 
-        # TODO scrape all quotes like handicap and under over...
-        # Make the quotes for Handicap and all other bets visible
-        # buttons = self.driver.find_elements_by_xpath("//div[@class='t_more bl align_c right']")
-        #
-        # for button in buttons:
-        #     button.click()
+
 
         self.soup = Bs(self.driver.page_source, "html.parser")
 
@@ -200,4 +233,10 @@ class TipicoScraper:
         for match in self.matches:
             print(match.__str__("ONLY_LOWEST_QUOTE"))
 
+# TODO scrape all quotes like handicap and under over...
+# Make the quotes for Handicap and all other bets visible
+# buttons = self.driver.find_elements_by_xpath("//div[@class='t_more bl align_c right']")
+#
+# for button in buttons:
+#     button.click()
 

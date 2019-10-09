@@ -29,6 +29,8 @@ class CombinationBetCreator:
         self.stdev = None
         self.amount_of_combi_bets = None
 
+        assert len(matches) >= combination_size, "Not enough matches to create combibets. Check configs. Maybe no games in the planed time?"
+
     def create_bets_with_outcome_lowest_quote(self):
         self.bets = []
 
