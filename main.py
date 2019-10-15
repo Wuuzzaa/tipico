@@ -18,7 +18,7 @@ def main():
     print("########################\n")
 
     # matches
-    print("matches for bets:")
+    print(f"matches for bets: {len(scraper.matches)}")
     scraper.print_matches()
     print("########################\n")
 

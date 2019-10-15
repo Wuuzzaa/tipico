@@ -7,7 +7,8 @@ class BetsToExcel:
         self.file_name = file_name
         self.predicted_outcomes = []
         self.actual_outcomes = []
-        self.leagues = []
+        self.league_names = []
+        self.countries = []
         self.quotes = []
         self.combi_quotes = []
         self.home_teams = []
@@ -19,7 +20,8 @@ class BetsToExcel:
             for bet in combi_bet.bets:
                 self.predicted_outcomes.append(bet.outcome)
                 self.actual_outcomes.append(None)
-                self.leagues.append(bet.match.league)
+                self.league_names.append(bet.match.league.name)
+                self.countries.append(bet.match.league.country)
                 self.quotes.append(bet.quote)
                 self.home_teams.append(bet.match.home_team)
                 self.away_teams.append(bet.match.away_team)
@@ -34,7 +36,8 @@ class BetsToExcel:
             # add empty entry for blank line in the excelfile
             self.predicted_outcomes.append(None)
             self.actual_outcomes.append(None)
-            self.leagues.append(None)
+            self.league_names.append(None)
+            self.countries.append(None)
             self.quotes.append(None)
             self.combi_quotes.append(None)
             self.home_teams.append(None)
@@ -49,7 +52,8 @@ class BetsToExcel:
                 "Combination Quote:": self.combi_quotes,
                 "Date:": self.match_dates,
                 "Quote:": self.quotes,
-                "League:": self.leagues,
+                "League:": self.league_names,
+                "Country:" : self.countries,
                 "Home Team:": self.home_teams,
                 "Away Team:": self.away_teams,
                 "Outcome Prediction:": self.predicted_outcomes,

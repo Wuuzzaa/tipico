@@ -2,65 +2,116 @@ from bs4 import BeautifulSoup as Bs
 from match import Match
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
+from league import League
 import datetime
 
 
 class TipicoScraper:
-    # Constants - Soccerleagueurls
-    URLS = {
-        # BRASILIEN
-        "CAMPEONATO_BRASILEIRO_SERIE_A": "https://www.tipico.de/de/online-sportwetten/fussball/brasilien/campeonato-brasilero-a/g83301/",
-        
-        # DEUTSCHLAND
-        "BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/bundesliga/g42301/",
-        "2_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/2-bundesliga/g41301/",
-        "3_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/deutschland/3-liga/g8343301/",
+    LEAGUES = []
+    LEAGUES.append(League(
+        name="CAMPEONATO_BRASILEIRO_SERIE_A",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/brasilien/campeonato-brasilero-a/g83301/",
+        country="BRASILIEN"))
 
-        # DÄNEMARK
-        "SUPERLIGAEN": "https://www.tipico.de/de/online-sportwetten/fussball/danemark/superligaen/g12301/",
+    LEAGUES.append(League(
+        name="BUNDESLIGA",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/deutschland/bundesliga/g42301/",
+        country="DEUTSCHLAND"))
 
-        # ENGLAND
-        "PREMIER_LEAGUE": "https://www.tipico.de/de/online-sportwetten/fussball/england/premier-league/g1301/",
-        "CHAMPIONSHIP": "https://www.tipico.de/de/online-sportwetten/fussball/england/championship/g2301/",
+    LEAGUES.append(League(
+        name="2_BUNDESLIGA",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/deutschland/2-bundesliga/g41301/",
+        country="DEUTSCHLAND"))
 
-        # SPANIEN
-        "LA_LIGA": "https://www.tipico.de/de/online-sportwetten/fussball/spanien/la-liga/g36301/",
-        "LA_LIGA_2": "https://www.tipico.de/de/online-sportwetten/fussball/spanien/la-liga-2/g37301/",
+    LEAGUES.append(League(
+        name="3_BUNDESLIGA",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/deutschland/3-liga/g8343301/",
+        country="DEUTSCHLAND"))
 
-        # FRANKREICH
-        "LIGUE_1": "https://www.tipico.de/de/online-sportwetten/fussball/frankreich/ligue-1/g4301/",
+    LEAGUES.append(League(
+        name="SUPERLIGAEN",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/danemark/superligaen/g12301/",
+        country="DÄNEMARK"))
 
-        # PORTUGAL
-        "PRIMEIRA_LIGA": "https://www.tipico.de/de/online-sportwetten/fussball/portugal/primeira-liga/g52301/",
+    LEAGUES.append(League(
+        name="PREMIER_LEAGUE",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/england/premier-league/g1301/",
+        country="ENGLAND"))
 
-        # NIEDERLANDE
-        "EREDIVISIE": "https://www.tipico.de/de/online-sportwetten/fussball/niederlande/eredivisie/g39301/",
+    LEAGUES.append(League(
+        name="CHAMPIONSHIP",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/england/championship/g2301/",
+        country="ENGLAND"))
 
-        # USA
-        "MLS": "https://www.tipico.de/de/online-sportwetten/fussball/usa/mls/g18301/",
+    LEAGUES.append(League(
+        name="LA_LIGA",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/spanien/la-liga/g36301/",
+        country="SPANIEN"))
 
-        # ÖSTERREICH
-        "TIPICO_BUNDESLIGA": "https://www.tipico.de/de/online-sportwetten/fussball/osterreich/tipico-bundesliga/g29301/",
+    LEAGUES.append(League(
+        name="LA_LIGA_2",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/spanien/la-liga-2/g37301/",
+        country="SPANIEN"))
 
-        # ITALIEN
-        "SERIE_A": "https://www.tipico.de/de/online-sportwetten/fussball/italien/serie-a/g33301/",
-        "SERIE_B": "https://www.tipico.de/de/online-sportwetten/fussball/italien/serie-b/g34301/",
+    LEAGUES.append(League(
+        name="LIGUE_1",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/frankreich/ligue-1/g4301/",
+        country="FRANKREICH"))
 
-        # TÜRKEI
-        "SUPERLIG": "https://www.tipico.de/de/online-sportwetten/fussball/turkei/superlig/g62301/",
+    LEAGUES.append(League(
+        name="PRIMEIRA_LIGA",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/portugal/primeira-liga/g52301/",
+        country="PORTUGAL"))
 
-        # BELGIEN
-        "FIRST_DIVISION_A": "https://www.tipico.de/de/online-sportwetten/fussball/belgien/first-division-a/g38301/",
+    LEAGUES.append(League(
+        name="EREDIVISIE",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/niederlande/eredivisie/g39301/",
+        country="NIEDERLANDE"))
 
-        # SCHWEIZ
-        "SUPER_LEAGUE": "https://www.tipico.de/de/online-sportwetten/fussball/schweiz/super-league/g1060301/",
+    LEAGUES.append(League(
+        name="MLS",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/usa/mls/g18301/",
+        country="USA"))
 
-        # SCHWEDEN
-        "ALLSVENSKAN": "https://www.tipico.de/de/online-sportwetten/fussball/schweden/allsvenskan/g24301/",
+    LEAGUES.append(League(
+        name="TIPICO_BUNDESLIGA",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/osterreich/tipico-bundesliga/g29301/",
+        country="ÖSTERREICH"))
 
-        # RUSSLAND
-        "PREMIER_LEAGUE(RUSSLAND)": "https://www.tipico.de/de/online-sportwetten/fussball/russland/premier-league/g53301/",
-    }
+    LEAGUES.append(League(
+        name="SERIE_A",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/italien/serie-a/g33301/",
+        country="ITALIEN"))
+
+    LEAGUES.append(League(
+        name="SERIE_B",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/italien/serie-b/g34301/",
+        country="ITALIEN"))
+
+    LEAGUES.append(League(
+        name="SUPERLIG",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/turkei/superlig/g62301/",
+        country="TÜRKEI"))
+
+    LEAGUES.append(League(
+        name="FIRST_DIVISION_A",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/belgien/first-division-a/g38301/",
+        country="BELGIEN"))
+
+    LEAGUES.append(League(
+        name="SUPER_LEAGUE",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/schweiz/super-league/g1060301/",
+        country="SCHWEIZ"))
+
+    LEAGUES.append(League(
+        name="ALLSVENSKAN",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/schweden/allsvenskan/g24301/",
+        country="SCHWEDEN"))
+
+    LEAGUES.append(League(
+        name="PREMIER_LEAGUE",
+        url="https://www.tipico.de/de/online-sportwetten/fussball/russland/premier-league/g53301/",
+        country="RUSSLAND"))
 
     def __init__(self):
         self.matches = []
@@ -180,9 +231,9 @@ class TipicoScraper:
         """Scraps all Ligues in the URLS-Constant"""
         self.clear()
 
-        for liga_name, url in TipicoScraper.URLS.items():
-            print(f"scraping: {liga_name}")
-            self.__read_site_soup(url)
+        for league in TipicoScraper.LEAGUES:
+            print(f"scraping: {league.country}: {league.name}")
+            self.__read_site_soup(league.url)
             home_teams, away_teams = self.__scrape_teams()
             home_win_quotes, draw_quotes, away_win_quotes = self.__scrape_quotes()
             dates, times = self.__scrape_match_date_and_time()
@@ -192,7 +243,7 @@ class TipicoScraper:
                 home_win_quotes,
                 draw_quotes,
                 away_win_quotes,
-                liga_name,
+                league,
                 dates,
                 times
             )

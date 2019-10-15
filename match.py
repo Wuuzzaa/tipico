@@ -16,10 +16,10 @@ class Match:
 
     def __str__(self, mode=None):
         if mode == "ONLY_LOWEST_QUOTE":
-            return f"{self.league}: {self.home_team} vs. {self.away_team}: {self.lowest_quote}"
+            return f"{self.league.country} {self.league.name}: {self.home_team} vs. {self.away_team}: {self.lowest_quote}"
 
         else:
-            return f"{self.league}: {self.home_team} vs. {self.away_team}: {self.quote_home_win} {self.quote_draw} {self.quote_away_win}"
+            return f"{self.league.country} {self.league.name}: {self.home_team} vs. {self.away_team}: {self.quote_home_win} {self.quote_draw} {self.quote_away_win}"
 
     def get_lowest_quote(self):
         return min(self.quote_away_win, self.quote_draw, self.quote_home_win)
