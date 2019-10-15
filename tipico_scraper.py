@@ -82,9 +82,6 @@ class TipicoScraper:
 
     def __read_site_soup(self, url):
         self.driver.get(url)
-
-
-
         self.soup = Bs(self.driver.page_source, "html.parser")
 
     def __scrape_teams(self):
@@ -162,19 +159,20 @@ class TipicoScraper:
             len(dates) == \
             len(times)
 
+        # amount_matches also equals away_teams xyz_quotes, dates, times, etc...
         amount_matches = len(home_teams)
 
         for i in range(amount_matches):
             self.matches.append(
                 Match(
-                    home_teams[i],
-                    away_teams[i],
-                    home_win_quotes[i],
-                    draw_quotes[i],
-                    away_win_quotes[i],
-                    league,
-                    dates[i],
-                    times[i]
+                    home_team=home_teams[i],
+                    away_team=away_teams[i],
+                    quote_home_win=home_win_quotes[i],
+                    quote_draw=draw_quotes[i],
+                    quote_away_win=away_win_quotes[i],
+                    league=league,
+                    date=dates[i],
+                    time=times[i]
                 )
             )
 
@@ -199,6 +197,8 @@ class TipicoScraper:
                 times
             )
 
+            print(f"found {len(home_teams)} matches \n")
+
             # When we click on a new league on tipico the new league opens above the old league so we would receive
             # matches multiple times. The easiest way to avoid this is to get a new browser. Better way is to delete the
             # cookies
@@ -212,11 +212,19 @@ class TipicoScraper:
 
     def filter_min_lowest_quote(self, quote):
         """Filters all matches which lowest quote is lower than the quote parameter"""
+        len_before = len(self.matches)
         self.matches = [x for x in self.matches if x.lowest_quote >= quote]
+        len_after = len(self.matches)
+
+        print(f"{self.filter_min_lowest_quote.__name__} @ {quote} filterd {len_before - len_after} matches")
 
     def filter_max_lowest_quote(self, quote):
         """Filters all matches which lowest quote is higher than the quote parameter"""
+        len_before = len(self.matches)
         self.matches = [x for x in self.matches if x.lowest_quote <= quote]
+        len_after = len(self.matches)
+
+        print(f"{self.filter_max_lowest_quote.__name__} @ {quote} filterd {len_before - len_after} matches")
 
     def filter_time_horizon_start_in_next_days(self, start_in_next_days):
         """
@@ -226,8 +234,11 @@ class TipicoScraper:
         """
         now = datetime.datetime.today()
         limit_datetime = now + + datetime.timedelta(days=start_in_next_days)
+        len_before = len(self.matches)
 
         self.matches = [x for x in self.matches if x.datetime <= limit_datetime]
+        len_after = len(self.matches)
+        print(f"{self.filter_time_horizon_start_in_next_days.__name__} @ {start_in_next_days} filterd {len_before - len_after} matches")
 
     def print_matches(self):
         for match in self.matches:

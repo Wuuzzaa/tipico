@@ -10,12 +10,17 @@ def main():
     print("########################")
 
     # filter
+    print("Filtering...")
     scraper.sort_matches_by_lowest_quote()
     scraper.filter_time_horizon_start_in_next_days(7)
     scraper.filter_min_lowest_quote(1.15)
     scraper.filter_max_lowest_quote(1.45)
+    print("########################\n")
+
+    # matches
+    print("matches for bets:")
     scraper.print_matches()
-    print("########################")
+    print("########################\n")
 
     # create, optimize bets
     cbc = CombinationBetCreator(matches=scraper.matches, combination_size=3)
