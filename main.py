@@ -28,11 +28,11 @@ def main():
     cbc.create_random_combi_bets()
     cbc.refresh_statistics()
     cbc.sort_combi_bets_by_quote()
-    print(cbc)
+    print(cbc.__str__(mode="SHORT"))
     print("########################")
 
     cbc.optimize()
-    print(cbc)
+    print(cbc.__str__(mode="SHORT"))
 
     saver = BetsToExcel(cbc.combi_bets)
     saver.fill_data_lists()

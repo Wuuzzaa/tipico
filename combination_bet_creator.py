@@ -71,14 +71,20 @@ class CombinationBetCreator:
         return self.combi_bets
 
     def __str__(self, mode=None):
+        """
+        Print statistics like amount of combibets, mean and stdev.
+        :param mode: SHORT. The combinationbets are not printed
+        :return:
+        """
         text = \
             f"Statistics: \n" \
             f"Amount of Combibets: {self.amount_of_combi_bets}\n" \
             f"Mean: {self.mean}\n" \
-            f"Stdev: {self.stdev}\n" \
-            f"Combination Bets: \n"
+            f"Stdev: {self.stdev}\n"
 
         if mode != "SHORT":
+            text += f"Combination Bets: \n"
+
             for combi_bet in self.combi_bets:
                 text += f"{str(combi_bet)} \n"
 
@@ -169,7 +175,3 @@ class CombinationBetCreator:
                 high = len(self.combi_bets) - 1
 
             self.sort_combi_bets_by_quote()
-
-            #print("\nOptimize:")
-            #print(self.__str__("SHORT"))
-
