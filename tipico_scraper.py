@@ -3,6 +3,7 @@ from match import Match
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from league import League
+from color_print import print_red
 import datetime
 
 
@@ -248,7 +249,15 @@ class TipicoScraper:
                 times
             )
 
-            print(f"found {len(home_teams)} matches \n")
+            # we could use away_teams or quotes here... all have the same len()
+            amount_matches = len(home_teams)
+            text = f"found {amount_matches} matches \n"
+
+            # Print the amount of founded matches in red if no match was found
+            if amount_matches == 0:
+                print_red(text)
+            else:
+                print(text)
 
             # When we click on a new league on tipico the new league opens above the old league so we would receive
             # matches multiple times. The easiest way to avoid this is to get a new browser. Better way is to delete the
