@@ -1,9 +1,8 @@
 import pump_data
-from operator import itemgetter
-
 import datetime
 import numpy as np
 import arrow
+from operator import itemgetter
 
 
 class WaterPumpAnalyzer:
@@ -11,8 +10,8 @@ class WaterPumpAnalyzer:
         # Create your storage attributes here.
         self.storage_pump = []
         self.storage_rain_gauge = []
-        self.locations_counter = 0
         self.location_dict = {}
+        self.lists_sorted = False
 
     def handle_message(self, data: dict):
         # This method gets called with the raw data. Implement this in Scenario 1.
@@ -32,9 +31,6 @@ class WaterPumpAnalyzer:
             self.storage_rain_gauge.append(array)
 
     def get_raw_data(self, timestamp: str, device: str, location: str) -> dict:
-        # Implement this in Scenario 1
-        # print({"time": timestamp, "device": device, "location": location})
-
         time = arrow.get(timestamp)
 
         if device == "pump":
@@ -46,6 +42,55 @@ class WaterPumpAnalyzer:
                 if rain_gauge[0] == time and location == rain_gauge[1]:
                     return rain_gauge[2]
 
+    def is_pump_above_average(self, time_check_start, time_check_end, location, time_start, time_end):
+        """
+        method to check if the pump energy consumption is 20% higher than normal
+        """
+        sum_pump_check = 0
+        pump_records_check = 0
+
+        sum_pump_now = 0
+        pump_records_now = 0
+
+        for pump in self.storage_pump:
+            if pump[0] >= time_check_start and pump[0] <= time_check_end and location == pump[1]:
+                pump_records_check += 1
+                sum_pump_check += pump[2]
+            elif pump[0] >= time_start and pump[0] <= time_end and location == pump[1]:
+                pump_records_now += 1
+                sum_pump_now += pump[2]
+            elif pump[0] > time_end:
+                break
+
+        pump_mean_check = sum_pump_check / pump_records_check
+        pump_mean_now = sum_pump_now / pump_records_now
+
+        return (pump_mean_now / pump_mean_check) >= 1.2
+
+    def is_rain_gauge_above_average(self, time_check_start, time_check_end, location, time_start, time_end):
+        """
+        method to check if the rain_gauge value is 20% higher than normal
+        """
+        rain_gauge_records_check = 0
+        sum_rain_gauge_check = 0
+        rain_gauge_records_now = 0
+        sum_rain_gauge_now = 0
+
+        for rain_gauge in self.storage_rain_gauge:
+            if rain_gauge[0] >= time_check_start and rain_gauge[0] <= time_check_end and location == rain_gauge[1]:
+                rain_gauge_records_check += 1
+                sum_rain_gauge_check += rain_gauge[2]
+            elif rain_gauge[0] >= time_start and rain_gauge[0] <= time_end and location == rain_gauge[1]:
+                rain_gauge_records_now += 1
+                sum_rain_gauge_now += rain_gauge[2]
+            elif rain_gauge[0] > time_end:
+                break
+
+        rain_gauge_mean_check = sum_rain_gauge_check / rain_gauge_records_check
+        rain_gauge_mean_now = sum_rain_gauge_now / rain_gauge_records_now
+
+        return (rain_gauge_mean_now / rain_gauge_mean_check) >= 1.2
+
     def is_error_mode(self, start: datetime.date, end: datetime.date, location: str) -> bool:
         # Implement this in Scenario 2,3 and 4
 
@@ -53,6 +98,11 @@ class WaterPumpAnalyzer:
         # print("start", start)
         # print("end", end)
 
+        # sort the data first
+        if not self.lists_sorted:
+            self.sort_by_date()
+
+        # calculate the start and end days for the checkperiode and the periode to be checked against
         delta = (end - start).days + 1
 
         check_start = start - datetime.timedelta(days=delta)
@@ -73,62 +123,18 @@ class WaterPumpAnalyzer:
         # print("time_check_start", time_check_start)
         # print("time_check_end", time_check_end)
 
-        # pump
-        sum_pump_check = 0
-        pump_records_check = 0
-
-        sum_pump_now = 0
-        pump_records_now = 0
-
-        for pump in self.storage_pump:
-            if pump[0] >= time_check_start and pump[0] <= time_check_end and location == pump[1]:
-                pump_records_check += 1
-                sum_pump_check += pump[2]
-            elif pump[0] >= time_start and pump[0] <= time_end and location == pump[1]:
-                pump_records_now += 1
-                sum_pump_now += pump[2]
-            elif pump[0] > time_end:
-                break
-
-        print(sum_pump_check, pump_records_check, sum_pump_now, pump_records_now)
-        pump_mean_check = sum_pump_check / pump_records_check
-        pump_mean_now = sum_pump_now / pump_records_now
-
         # print(pump_mean_check, pump_mean_now)
 
-        # check rain_gauge
-        if (pump_mean_now / pump_mean_check) >= 1.2:
-            # print("Must check rain for error clarification")
-
-            rain_gauge_records_check = 0
-            sum_rain_gauge_check = 0
-            rain_gauge_records_now = 0
-            sum_rain_gauge_now = 0
-
-            for rain_gauge in self.storage_rain_gauge:
-                if rain_gauge[0] >= time_check_start and rain_gauge[0] <= time_check_end and location == rain_gauge[1]:
-                    rain_gauge_records_check += 1
-                    sum_rain_gauge_check += rain_gauge[2]
-                elif rain_gauge[0] >= time_start and rain_gauge[0] <= time_end and location == rain_gauge[1]:
-                    rain_gauge_records_now += 1
-                    sum_rain_gauge_now += rain_gauge[2]
-                elif rain_gauge[0] > time_end:
-                    break
-            # print(rain_gauge_records_check, sum_rain_gauge_check, rain_gauge_records_now, sum_rain_gauge_now)
-
-            rain_gauge_mean_check = sum_rain_gauge_check / rain_gauge_records_check
-            rain_gauge_mean_now = sum_rain_gauge_now / rain_gauge_records_now
-
-            # print(rain_gauge_mean_check, rain_gauge_mean_now)
-
-            if (rain_gauge_mean_now / rain_gauge_mean_check) < 1.2:
+        if not self.is_rain_gauge_above_average(time_check_start, time_check_end, location, time_start, time_end):
+            if self.is_pump_above_average(time_check_start, time_check_end, location, time_start, time_end):
                 return True
-
         return False
 
     def sort_by_date(self):
         self.storage_pump.sort(key=itemgetter(0))
         self.storage_rain_gauge.sort(key=itemgetter(0))
+
+        self.lists_sorted = True
 
 ##############
 wpa = WaterPumpAnalyzer()
