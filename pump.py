@@ -1,4 +1,6 @@
 import pump_data
+import sys
+
 import datetime
 import numpy as np
 import arrow
@@ -12,6 +14,8 @@ class WaterPumpAnalyzer:
         self.storage_rain_gauge = []
         self.location_dict = {}
         self.lists_sorted = False
+        self.pump_days_dict = {}
+        self.rain_gauge_days_dict = {}
 
     def handle_message(self, data: dict):
         # This method gets called with the raw data. Implement this in Scenario 1.
@@ -98,9 +102,10 @@ class WaterPumpAnalyzer:
         # print("start", start)
         # print("end", end)
 
-        # sort the data first
+        # sort the data first and get the startindex for each day
         if not self.lists_sorted:
             self.sort_by_date()
+            self.refresh_datestart_indices()
 
         # calculate the start and end days for the checkperiode and the periode to be checked against
         delta = (end - start).days + 1
@@ -136,6 +141,28 @@ class WaterPumpAnalyzer:
 
         self.lists_sorted = True
 
+    def refresh_datestart_indices(self):
+        """
+        Method to refresh the indicies for pump and rain gauge for the first day in the storage lists
+        key = day, value = first index of this day in the store lists
+        """
+        # reset
+        self.pump_days_dict = {}
+        self.rain_gauge_days_dict = {}
+
+        # pump
+        for i in range(len(self.storage_pump)):
+            day = self.storage_pump[i][0].date()
+            if day not in self.pump_days_dict:
+                self.pump_days_dict[day] = i
+
+        # rain gauge
+        for i in range(len(self.storage_rain_gauge)):
+            day = self.storage_rain_gauge[i][0].date()
+            if day not in self.rain_gauge_days_dict:
+                self.rain_gauge_days_dict[day] = i
+
+
 ##############
 wpa = WaterPumpAnalyzer()
 
@@ -144,8 +171,6 @@ for x in pump_data.data_input:
 
 for x in pump_data.data_search:
     wpa.get_raw_data(x["time"], x["device"], x["location"])
-
-wpa.sort_by_date()
 
 for x in pump_data.data_is_error_mode:
     start = x["start"]
