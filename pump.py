@@ -51,53 +51,60 @@ class WaterPumpAnalyzer:
         method to check if the pump energy consumption is 20% higher than normal
         """
         sum_pump_check = 0
-        pump_records_check = 0
-
         sum_pump_now = 0
-        pump_records_now = 0
 
-        for pump in self.storage_pump:
-            if pump[0] >= time_check_start and pump[0] <= time_check_end and location == pump[1]:
-                pump_records_check += 1
+        # It is possible that we do not have date stored for the first day to check so we set the date to the next days
+        # until we have date and a valid index
+        first_index = None
+        first_day = time_check_start.date()
+        while first_index is None:
+            try:
+                first_index = self.rain_gauge_days_dict[first_day]
+            except KeyError:
+                first_day = first_day + datetime.timedelta(days=1)
+
+        for i in range(first_index, len(self.storage_pump)):
+            pump = self.storage_pump[i]
+
+            if pump[0] <= time_check_end and location == pump[1]:
                 sum_pump_check += pump[2]
-            elif pump[0] >= time_start and pump[0] <= time_end and location == pump[1]:
-                pump_records_now += 1
+            elif time_start <= pump[0] <= time_end and location == pump[1]:
                 sum_pump_now += pump[2]
             elif pump[0] > time_end:
                 break
 
-        pump_mean_check = sum_pump_check / pump_records_check
-        pump_mean_now = sum_pump_now / pump_records_now
-
-        return (pump_mean_now / pump_mean_check) >= 1.2
+        return (sum_pump_now / sum_pump_check) >= 1.2
 
     def is_rain_gauge_above_average(self, time_check_start, time_check_end, location, time_start, time_end):
         """
         method to check if the rain_gauge value is 20% higher than normal
         """
-        rain_gauge_records_check = 0
         sum_rain_gauge_check = 0
-        rain_gauge_records_now = 0
         sum_rain_gauge_now = 0
 
-        for rain_gauge in self.storage_rain_gauge:
-            if rain_gauge[0] >= time_check_start and rain_gauge[0] <= time_check_end and location == rain_gauge[1]:
-                rain_gauge_records_check += 1
+        # It is possible that we do not have date stored for the first day to check so we set the date to the next days
+        # until we have date and a valid index
+        first_index = None
+        first_day = time_check_start.date()
+        while first_index is None:
+            try:
+                first_index = self.rain_gauge_days_dict[first_day]
+            except KeyError:
+                first_day = first_day + datetime.timedelta(days=1)
+
+        for i in range(first_index, len(self.storage_rain_gauge)):
+            rain_gauge = self.storage_rain_gauge[i]
+
+            if rain_gauge[0] <= time_check_end and location == rain_gauge[1]:
                 sum_rain_gauge_check += rain_gauge[2]
-            elif rain_gauge[0] >= time_start and rain_gauge[0] <= time_end and location == rain_gauge[1]:
-                rain_gauge_records_now += 1
+            elif time_start <= rain_gauge[0] <= time_end and location == rain_gauge[1]:
                 sum_rain_gauge_now += rain_gauge[2]
             elif rain_gauge[0] > time_end:
                 break
 
-        rain_gauge_mean_check = sum_rain_gauge_check / rain_gauge_records_check
-        rain_gauge_mean_now = sum_rain_gauge_now / rain_gauge_records_now
-
-        return (rain_gauge_mean_now / rain_gauge_mean_check) >= 1.2
+        return (sum_rain_gauge_now / sum_rain_gauge_check) >= 1.2
 
     def is_error_mode(self, start: datetime.date, end: datetime.date, location: str) -> bool:
-        # Implement this in Scenario 2,3 and 4
-
         # print("location", location)
         # print("start", start)
         # print("end", end)
@@ -125,11 +132,7 @@ class WaterPumpAnalyzer:
 
         time_end = time_end.replace(hour=23, minute=59, second=59)
 
-        # print("time_check_start", time_check_start)
-        # print("time_check_end", time_check_end)
-
-        # print(pump_mean_check, pump_mean_now)
-
+        # check the error condition
         if not self.is_rain_gauge_above_average(time_check_start, time_check_end, location, time_start, time_end):
             if self.is_pump_above_average(time_check_start, time_check_end, location, time_start, time_end):
                 return True
